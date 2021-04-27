@@ -1,4 +1,51 @@
-<?php include('server.php') ?>
+<?php
+
+
+function request($field) {
+    return isset($_REQUEST[$field]) && $_REQUEST[$field] != "" ? trim($_REQUEST[$field]) : null;
+}
+
+function has_error($field){
+    global $error;
+    return isset($error[$field]);
+}
+
+
+function get_error($field){
+    global $error;
+    return has_error($error[$field]) ? $error[$field] : null;
+}
+
+$error=[];
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $name = request('name');
+    $password = request('password');
+   
+   
+
+    if(! is_null($password) && ! is_null($name)) {
+        $link = mysqli_connect('localhost:3306', 'root', '');
+        if (! $link){
+            echo 'error: ' .mysqli_connect_error($link); 
+        }
+        mysqli_select_db($link, 'php');
+
+        $query = "SELECT * FROM users WHERE name='$name' AND password='$password'";
+        $results = mysqli_query($link, $query);
+        if (mysqli_num_rows($results) == 1) {
+            $_SESSION['name'] = $name;
+            $_SESSION['success'] = "You are now logged in";
+            header('location: task.php');
+        }else {
+            echo 'Wrong username/password combination';   
+        }
+    }
+
+}
+
+
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -81,20 +128,25 @@
 </div>
 
 <form method="post" action="login.php">
-    <?php include('errors.php'); ?>
     <div class="input-group">
         <label>Username</label>
-        <input type="text" name="username" >
+        <input type="text" name="name" >
+        <?php if(has_error('name')) { ?>
+                <span><?php  echo get_error('name'); ?></span><br>
+        <?php  } ?>
     </div>
     <div class="input-group">
         <label>Password</label>
         <input type="password" name="password">
+        <?php if(has_error('password')) { ?>
+                <span><?php  echo get_error('password'); ?></span><br>
+        <?php  } ?>
     </div>
     <div class="input-group">
         <button type="submit" class="btn" name="login_user">Login</button>
     </div>
     <p>
-        Not yet a member? <a href="register.php">Sign up</a>
+        Not yet a member? <a href="index.php">Sign up</a>
     </p>
 </form>
 </body>

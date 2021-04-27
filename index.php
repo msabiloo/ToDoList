@@ -1,8 +1,65 @@
-<?php include('server.php') ?>
+<?php
+
+
+function request($field) {
+    return isset($_REQUEST[$field]) && $_REQUEST[$field] != "" ? trim($_REQUEST[$field]) : null;
+}
+
+function has_error($field){
+    global $error;
+    return isset($error[$field]);
+}
+
+
+function get_error($field){
+    global $error;
+    return has_error($error[$field]) ? $error[$field] : null;
+}
+
+$error=[];
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $name = request('name');
+    $email = request('email');
+    $password_1 = request('password_1');
+    $password_2 = request('password_2');
+    
+
+    if (is_null($email)){
+        $error['email'] = "The email field could not be empty";
+        var_dump($error);
+    };
+    
+    if (is_null($password_1) || is_null($password_2)){
+        $error['password'] = "The password fild could not be empty";
+        var_dump($error);
+        if ($password_1 != $password_2 ){
+            $error['password'] = "The password ";
+            var_dump($error);
+        }
+    }
+
+    if(! is_null($email) && ! is_null($password_1) && ! is_null($password_2)) {
+        $link = mysqli_connect('localhost:3306', 'root', '');
+        if (! $link){
+            echo 'error: ' .mysqli_connect_error($link); 
+        }
+        mysqli_select_db($link, 'php');
+
+        $SQL = "INSERT INTO `users`( `name`, `email`, `password`) VALUES ('{$name}','{$email}','{$password_1}')";
+        if ($result = mysqli_query($link, $SQL)) { ?>
+            <a href="login.php"></a>;
+        <?php }
+    }
+
+}
+
+
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Registration system PHP and MySQL</title>
+    <title>Registration</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
         * {
@@ -80,23 +137,31 @@
     <h2>Register</h2>
 </div>
 
-<form method="post" action="index.php">
-    <?php include('errors.php'); ?>
+<form action="/" method="post"> 
     <div class="input-group">
         <label>Username</label>
-        <input type="text" name="username" value="<?php echo $username; ?>">
+        <input type="text" name="name">
     </div>
     <div class="input-group">
         <label>Email</label>
-        <input type="email" name="email" value="<?php echo $email; ?>">
+        <input type="email" name="email"><br>
+            <?php if(has_error('email')) { ?>
+                <span><?php  echo get_error('email'); ?></span><br>
+            <?php  } ?>
     </div>
     <div class="input-group">
         <label>Password</label>
         <input type="password" name="password_1">
+        <?php if(has_error('password_1')) { ?>
+                <span><?php  echo get_error('password_1'); ?></span><br>
+        <?php  } ?>
     </div>
     <div class="input-group">
         <label>Confirm password</label>
         <input type="password" name="password_2">
+        <?php if(has_error('password_2')) { ?>
+                <span><?php  echo get_error('password_2'); ?></span><br>
+        <?php  } ?>
     </div>
     <div class="input-group">
         <button type="submit" class="btn" name="reg_user">Register</button>
