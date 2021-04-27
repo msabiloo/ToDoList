@@ -1,38 +1,21 @@
 <?php
 
-
-function request($field) {
-    return isset($_REQUEST[$field]) && $_REQUEST[$field] != "" ? trim($_REQUEST[$field]) : null;
+$link = mysqli_connect('localhost:3306' , 'root' , '');
+if(! $link) {
+    echo 'could not connect : ' . mysqli_connect_error();
+    exit;
 }
 
-function has_error($field){
-    global $error;
-    return isset($error[$field]);
+mysqli_select_db($link , 'php');
+
+$SQL = "select name from tasks ORDER by id DESC ";
+
+if( $result = mysqli_query($link , $SQL) ) {
+} else {
+    echo 'error : ' . mysqli_error($link);
+    exit;
 }
 
-
-function get_error($field){
-    global $error;
-    return has_error($error[$field]) ? $error[$field] : null;
-}
-
-$error=[];
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $task = request('task');
-    
-   
-   
-
-    if(! is_null($task)) {
-        $link = mysqli_connect('localhost:3306', 'root', '');
-        if (! $link){
-            echo 'error: ' .mysqli_connect_error($link); 
-        }
-        mysqli_select_db($link, 'php');
-
-    }
-
-}
 ?>
 
 
@@ -153,7 +136,7 @@ input {
 }
 
 /* Style the "Add" button */
-    .addBtn {
+.addBtn {
   padding: 10px;
   width: 25%;
   background: #d9d9d9;
@@ -166,7 +149,7 @@ input {
   border-radius: 0;
 }
 
-    .addBtn:hover {
+.addBtn:hover {
       background-color: #bbb;
     }
     </style>
@@ -179,12 +162,18 @@ input {
     </div>
 
     <ul id="myUL">
+
         <li>Hit the gym</li>
         <li class="checked">Pay bills</li>
         <li>Meet George</li>
         <li>Buy eggs</li>
         <li>Read a book</li>
         <li>Organize office</li>
+        <?php  while ($task = mysqli_fetch_assoc($result) ) { ?>
+                <li><?= $task['name'] ?></li>
+        <?php } ?> 
+
+        
     </ul>
 
 
@@ -245,6 +234,7 @@ function newElement() {
   }
 }
 </script>
+  
 
 </body>
 </html>
