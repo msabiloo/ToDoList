@@ -31,11 +31,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         mysqli_select_db($link, 'php');
 
         $query = "SELECT * FROM users WHERE name='$name' AND password='$password'";
+        //$id = "SELECT id FROM users WHERE name='$name'";
+        //var_dump($id);
+       
         $results = mysqli_query($link, $query);
+        $SQL = "SELECT id FROM users WHERE name='$name'";
+        $result = mysqli_query($link, $SQL);
+        $id = mysqli_fetch_assoc($result);
+        //$id = $select_id['id'];
         if (mysqli_num_rows($results) == 1) {
             $_SESSION['name'] = $name;
             $_SESSION['success'] = "You are now logged in";
-            header('location: task.php');
+            header("location: task.php?id={$id['id']}");
+            
         }else {
             echo 'Wrong username/password combination';   
         }
