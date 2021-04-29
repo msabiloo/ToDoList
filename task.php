@@ -194,8 +194,7 @@ input {
             <tr>
                 <td>
                     <input type="checkbox" style='height: 20px; width: 20px;' value="<?=$task['id']?>">
-                    <span class="checkmark"></span>
-                    <?php if(checked) {} ?>
+                    <span class="checkmark"></span>                    
                   </td>
                 <td><?= $task['name'] ?></td>
                 <td>
