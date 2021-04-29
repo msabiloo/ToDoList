@@ -140,14 +140,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         <label>Username</label>
         <input type="text" name="name" >
         <?php if(has_error('name')) { ?>
-                <span><?php  echo get_error('name'); ?></span><br>
+            <span><?php  echo get_error('name'); ?></span><br>
         <?php  } ?>
     </div>
     <div class="input-group">
         <label>Password</label>
         <input type="password" name="password">
         <?php if(has_error('password')) { ?>
-                <span><?php  echo get_error('password'); ?></span><br>
+            <span><?php  echo get_error('password'); ?></span><br>
         <?php  } ?>
     </div>
     <div class="input-group">

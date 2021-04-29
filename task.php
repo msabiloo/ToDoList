@@ -8,14 +8,28 @@ if(! $link) {
 
 mysqli_select_db($link , 'php');
 
-$SQL = "select name from tasks ORDER by id DESC ";
+$SQL = "select * from tasks ORDER by id DESC ";
 
 if( $result = mysqli_query($link , $SQL) ) {
 } else {
     echo 'error : ' . mysqli_error($link);
     exit;
 }
-
+$user_id = $_GET['id'];
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    //var_dump($id);
+    //$new_task = request('new_task');
+    $new_task = $_POST['new_task'];
+    // $new_task = 'test';
+    // var_dump($new_task);
+    $query = "INSERT INTO `tasks` (`user_id`,`name`) VALUE ($user_id, '$new_task')";
+    //var_dump($query);
+    $result= mysqli_query($link, $query);
+    header("Refresh:0");
+    //if($result === false){
+    //    var_dump(mysqli_error($link));
+   // }
+}
 ?>
 
 
@@ -28,9 +42,9 @@ if( $result = mysqli_query($link , $SQL) ) {
         /* Include the padding and border in an element's total width and height */
 * {
   box-sizing: border-box;
-}
+    }
 .header {
-    width: 30%;
+    width: 50%;
     margin: 50px auto 0px;
     color: white;
     background: #5F9EA0;
@@ -40,17 +54,18 @@ if( $result = mysqli_query($link , $SQL) ) {
     border-radius: 10px 10px 0px 0px;
     padding: 20px;
         }
-form, .content, ul {
-            width: 30%;
-            margin: 0px auto;
-            padding: 20px;
-            border: 1px solid #B0C4DE;
+form, .content, ul, table {
+            width: 50%;
+            margin: 0px auto;      
             background: white;
             border-radius: 0px 0px 10px 10px;
+
         }
+        
+      
 
 /* Style the list items */
-ul li {
+table tr {
   cursor: pointer;
   position: relative;
   padding: 12px 8px 12px 40px;
@@ -66,24 +81,24 @@ ul li {
 }
 
 /* Set all odd list items to a different color (zebra-stripes) */
-ul li:nth-child(odd) {
+table tr:nth-child(odd) {
   background: #f9f9f9;
 }
 
 /* Darker background-color on hover */
-ul li:hover {
+table tr:hover {
   background: #ddd;
 }
 
 /* When clicked on, add a background color and strike out text */
-ul li.checked {
+table tr.checked {
   background: #888;
   color: #fff;
   text-decoration: line-through;
 }
 
 /* Add a "checked" mark when clicked on */
-ul li.checked::before {
+table tr.checked::before {
   content: '';
   position: absolute;
   border-color: #fff;
@@ -129,7 +144,7 @@ input {
   margin: 0;
   border: none;
   border-radius: 0;
-  width: 75%;
+ 
   padding: 10px;
   float: left;
   font-size: 16px;
@@ -152,89 +167,48 @@ input {
 .addBtn:hover {
       background-color: #bbb;
     }
+
+
+
+
     </style>
 </head>
 <body>
+
     <div id="myDIV" class="header">
-        <h2>My To Do List</h2>
-        <input type="text" id="myInput" placeholder="Title...">
-        <span onclick="newElement()" class="addBtn">Add</span>
-    </div>
-
-    <ul id="myUL">
-
-        <li>Hit the gym</li>
-        <li class="checked">Pay bills</li>
-        <li>Meet George</li>
-        <li>Buy eggs</li>
-        <li>Read a book</li>
-        <li>Organize office</li>
-        <?php  while ($task = mysqli_fetch_assoc($result) ) { ?>
-                <li><?= $task['name'] ?></li>
-        <?php } ?> 
-
-        
-    </ul>
-
-
-    <script>
-// Create a "close" button and append it to each list item
-var myNodelist = document.getElementsByTagName("LI");
-var i;
-for (i = 0; i < myNodelist.length; i++) {
-  var span = document.createElement("SPAN");
-  var txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  myNodelist[i].appendChild(span);
-}
-
-// Click on a close button to hide the current list item
-var close = document.getElementsByClassName("close");
-var i;
-for (i = 0; i < close.length; i++) {
-  close[i].onclick = function() {
-    var div = this.parentElement;
-    div.style.display = "none";
-  }
-}
-
-// Add a "checked" symbol when clicking on a list item
-var list = document.querySelector('ul');
-list.addEventListener('click', function(ev) {
-  if (ev.target.tagName === 'LI') {
-    ev.target.classList.toggle('checked');
-  }
-}, false);
-
-// Create a new list item when clicking on the "Add" button
-function newElement() {
-  var li = document.createElement("li");
-  var inputValue = document.getElementById("myInput").value;
-  var t = document.createTextNode(inputValue);
-  li.appendChild(t);
-  if (inputValue === '') {
-    alert("You must write something!");
-  } else {
-    document.getElementById("myUL").appendChild(li);
-  }
-  document.getElementById("myInput").value = "";
-
-  var span = document.createElement("SPAN");
-  var txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  li.appendChild(span);
-
-  for (i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-      var div = this.parentElement;
-      div.style.display = "none";
-    }
-  }
-}
-</script>
+        <h2>My To Do List</h2>      
+        <form method='post' action="task.php?id=<?=$user_id ?>">
+       
+            <input type="text" name="new_task" id="myInput" placeholder="Title...">
+        <!--  <span onclick="newElement()" class="addBtn">Add</span> -->
+            <button  type="submit" class="addBtn" name="add_task" > Add </button>
+            </form>
+            <button  type="submit" class="addBtn" name="add_task" >
+            
+             <a href="/history.php?user_id=<?=$user_id?>"> History </a>
+             </button>
+    </div>  
   
-
+        <?php  while ($task = mysqli_fetch_assoc($result) ) { 
+             if($task['user_id'] == $user_id) {?>          
+            <tr>
+                <td>
+                    <input type="checkbox" style='height: 20px; width: 20px;' value="<?=$task['id']?>">
+                    <span class="checkmark"></span>
+                    <?php if(checked) {} ?>
+                  </td>
+                <td><?= $task['name'] ?></td>
+                <td>
+               
+                  <a href="/edit.php?user_id=<?=$user_id?>&id=<?=$task['id']?>"> edit </a>
+                </td>
+                <td>
+                  <a href="/delete.php?user_id=<?=$user_id?>&id=<?=$task['id']?>">  delete </a>
+               </td>
+               
+            </tr>
+             <?php }
+             } ?> 
+        </table>  
 </body>
 </html>
